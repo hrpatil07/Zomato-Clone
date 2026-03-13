@@ -23,6 +23,10 @@ const options = {
         url: `http://localhost:${PORT}`,
         description: "Development server",
       },
+      {
+        url: "https://zomato-clone-soi0.onrender.com",
+        description: "Production server",
+      },
     ],
     // ── Reusable security scheme ──
     components: {
