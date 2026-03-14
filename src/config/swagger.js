@@ -4,7 +4,7 @@
  */
 
 const swaggerJsdoc = require("swagger-jsdoc");
-const { PORT } = require("./env");
+const { PORT, BASE_URL } = require("./env");
 
 const options = {
   definition: {
@@ -20,12 +20,8 @@ const options = {
     },
     servers: [
       {
-        url: `http://localhost:${PORT}`,
+        url: BASE_URL,
         description: "Development server",
-      },
-      {
-        url: "https://zomato-clone-soi0.onrender.com",
-        description: "Production server",
       },
     ],
     // ── Reusable security scheme ──
