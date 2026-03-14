@@ -296,6 +296,26 @@ const options = {
   apis: ["./src/routes/*.js"],
 };
 
-const swaggerSpec = swaggerJsdoc(options);
+const createSwaggerSpec = (baseUrl = BASE_URL) => {
+  const servers = [
+    { url: baseUrl, description: "Server" },
+    ...(options.definition.servers?.slice(1) || []),
+  ];
 
-module.exports = swaggerSpec;
+  const specOptions = {
+    ...options,
+    definition: {
+      ...options.definition,
+      servers,
+    },
+  };
+
+  return swaggerJsdoc(specOptions);
+};
+
+const swaggerSpec = createSwaggerSpec();
+
+module.exports = {
+  swaggerSpec,
+  getSwaggerSpec: createSwaggerSpec,
+};

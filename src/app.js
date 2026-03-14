@@ -7,7 +7,7 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const swaggerUi = require("swagger-ui-express");
-const swaggerSpec = require("./config/swagger");
+const { getSwaggerSpec } = require("./config/swagger");
 const errorHandler = require("./middleware/errorHandler");
 
 // ── Route imports ──
@@ -21,6 +21,9 @@ const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 
+// Enable correct protocol detection behind proxies (e.g. Render)
+app.set("trust proxy", true);
+
 // ── Global Middleware ──
 app.use(cors());
 app.use(express.json());
@@ -28,19 +31,27 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
 // ── Swagger API Docs ──
+// Serve the UI and load the JSON spec via /api-docs.json so we can dynamically
+// set the server URL based on the incoming request (host + protocol).
 app.use(
   "/api-docs",
   swaggerUi.serve,
-  swaggerUi.setup(swaggerSpec, {
+  swaggerUi.setup(null, {
     customCss: ".swagger-ui .topbar { display: none }",
     customSiteTitle: "Zomato Lite API Docs",
+    swaggerOptions: {
+      url: "/api-docs.json",
+    },
   })
 );
 
 // ── Swagger JSON spec endpoint ──
 app.get("/api-docs.json", (req, res) => {
+  const baseUrl = `${req.protocol}://${req.get("host")}`;
+  const spec = getSwaggerSpec(baseUrl);
+
   res.setHeader("Content-Type", "application/json");
-  res.send(swaggerSpec);
+  res.send(spec);
 });
 
 // ── Health check ──
